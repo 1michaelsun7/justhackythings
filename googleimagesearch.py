@@ -4,33 +4,33 @@ import cStringIO
 from pokemon_list_generator import pokemon_list_maker
 from clarifai_basic import ClarifaiCustomModel, ApiError
 
-concept = ClarifaiCustomModel('_AQuQqomUFFjD7MnNvWGCow-AHqJHB-dzFD2LqyU', '9RVaHVFFGwbfvypobBhM4grJf16EIKhJerBvh5l5')
+concept = ClarifaiCustomModel('u2ODPbKXe3I51y9TV2GPGqmF7ZzZ8SVInInj_8pb', 'hwIilWC2qT-4VJHG1HTpnXoavOLpCevjbZ9Osnz4')
 
 fetcher = urllib2.build_opener()
 
 pokemon_list = pokemon_list_maker()
 
-for pokemon in pokemon_list[383:]:
-	searchTerm = pokemon
-	googleimages = []
 
-	for sI in xrange(1):
-		startIndex = 4*sI
-		searchUrl = "http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=" + searchTerm + "&start=" + str(startIndex)
-		f = fetcher.open(searchUrl)
-		deserialized_output = json.load(f)
-		for i in xrange(min(len(deserialized_output['responseData']['results']), 10)):
-			imageUrl = deserialized_output['responseData']['results'][i]['unescapedUrl']
-			googleimages.append(imageUrl)		
+searchTerm = "Venusaur"
+googleimages = []
 
-	for images in googleimages:
-		try:
-			concept.positive(images, searchTerm)
-		except ApiError:
-			pass
+for sI in xrange(4):
+	startIndex = 4*sI
+	searchUrl = "http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=" + searchTerm + "+pokemon&start=" + str(startIndex)
+	f = fetcher.open(searchUrl)
+	deserialized_output = json.load(f)
+	for i in xrange(min(len(deserialized_output['responseData']['results']), 10)):
+		imageUrl = deserialized_output['responseData']['results'][i]['unescapedUrl']
+		googleimages.append(imageUrl)
 
-	concept.train(searchTerm)
-	print pokemon
+for images in googleimages:
+	try:
+		concept.positive(images, searchTerm)
+	except ApiError:
+		pass
+
+concept.train(searchTerm)
+print searchTerm
 
 """
 try:
